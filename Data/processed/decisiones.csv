@@ -1,0 +1,5 @@
+paso,columna,accion,filas_afectadas,justificacion
+3. numericos,asistencia_pct,quitar el símbolo %,300,"El % es formato, no dato; mientras exista, la columna no se puede tratar como número."
+3. numericos,asistencia_pct,'-' a nulo y convertir a número,202,"El guion es un faltante disfrazado: significa 'sin dato', así que debe ser un nulo real."
+3. numericos,horas_trabajo_semana,'-' a nulo y convertir a número,2822,El guion impide calcular con la columna; se vuelve nulo y en el paso 8 se pone 0 a quienes no trabajan (todos los guiones son de estudiantes con trabaja = 'no').
+3. numericos,distancia_km,999 a nulo,152,"999 km es un código de relleno, no una distancia real; si se deja, infla la distancia promedio."

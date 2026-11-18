@@ -42,6 +42,7 @@ def explorar(df):
 
     Respuesta: sí. asistencia_pct y horas_trabajo_semana aparecen como texto (str) porque tienen símbolos (%) o guiones (-) dentro.Además, solo con un valor no numérico es suficiente para que Pandas lea toda la columna como texto.
     """
+    print("1. Exploración inicial del dataset:")
     # TODO 1: imprimir shape, info(), describe() y value_counts() de las columnas indicadas.
     
     print("\nForma (filas, columnas):", df.shape)
@@ -64,19 +65,82 @@ def auditar(df):
     Revisa: nulos reales, faltantes disfrazados ('-', 999), valores imposibles
     (edad, promedio, horas), duplicados y formatos de fecha.
     Pregunta: ¿cuál de estos problemas afecta más el análisis? ¿Por qué?
+
+    Respuesta: los nulos reales y los faltantes disfrazados afectan más el análisis porque el que la respuesta devuelva un str en lugar de un número, o que haya valores imposibles, puede afectar la interpretación de los datos y la toma de decisiones basada en ellos.
     """
+    print("2. Auditoría de problemas en el dataset:")
     # TODO 2: imprimir cada uno de los conteos de problemas.
-    pass
+    # 1. Nulos reales (celdas vacías)
+    print("\nNulos reales por columna:")
+    print(df.isnull().sum())
+
+    # 2. Faltantes disfrazados (parecen dato, pero significan 'sin dato')
+    print("\nGuiones en asistencia_pct:", (df["asistencia_pct"] == "-").sum())
+    print("Guiones en horas_trabajo_semana:", (df["horas_trabajo_semana"] == "-").sum())
+    print("Valores 999 en distancia_km:", (df["distancia_km"] == 999).sum())
+
+    # 3. Formato inconsistente: números con símbolo
+    print("Celdas con % en asistencia_pct:",
+          df["asistencia_pct"].str.contains("%", regex=False).sum())
+
+    # 4. Valores imposibles (cada condición entre paréntesis, con | para 'o')
+    print("Edades fuera de 15 a 60:", ((df["edad"] < 15) | (df["edad"] > 60)).sum())
+    print("Promedios mayores a 5:", (df["promedio_acumulado"] > 5).sum())
+    horas = pd.to_numeric(df["horas_trabajo_semana"], errors="coerce")
+    print("Horas de trabajo mayores a 100:", (horas > 100).sum())
+
+    # 5. Duplicados (filas idénticas en todas las columnas)
+    print("Filas duplicadas:", df.duplicated().sum())
+
+    # 6. Fechas en dos formatos
+    print("Fechas en formato DD/MM/AAAA:",
+          df["fecha_matricula"].str.contains("/", regex=False).sum())
 
 
 def convertir_numericos(df):
     """Paso 3 del Word: columnas que deberían ser numéricas, pero llegan como texto.
-
+    
     Pistas: quitar el símbolo % con str.replace; reemplazar '-' por nulo;
     convertir con pd.to_numeric(..., errors="coerce"); reemplazar 999 por nulo en distancia_km.
     Registra cada conversión con registrar().
     """
+    print("3. Convertir columnas a numéricas:")
     # TODO 3: convertir asistencia_pct, horas_trabajo_semana y distancia_km a número.
+    # asistencia_pct 
+    # Parte 1: quitar el símbolo %
+    n_pct = df["asistencia_pct"].str.contains("%", regex=False).sum()      # 1. contar
+    df["asistencia_pct"] = df["asistencia_pct"].str.replace("%", "", regex=False)  # 2. corregir
+    registrar("3. numericos", "asistencia_pct", "quitar el símbolo %", n_pct,     # 3. registrar
+              "El % es formato, no dato; mientras exista, la columna no se puede tratar como número.")
+
+    # Parte 2: el guion pasa a nulo y la columna se convierte a número
+    n_guion = (df["asistencia_pct"] == "-").sum()
+    df["asistencia_pct"] = df["asistencia_pct"].replace("-", np.nan)
+    df["asistencia_pct"] = pd.to_numeric(df["asistencia_pct"], errors="coerce")
+    registrar("3. numericos", "asistencia_pct", "'-' a nulo y convertir a número", n_guion,
+              "El guion es un faltante disfrazado: significa 'sin dato', así que debe ser un nulo real.")
+
+    # horas_trabajo_semana
+    n_guion = (df["horas_trabajo_semana"] == "-").sum()
+    df["horas_trabajo_semana"] = df["horas_trabajo_semana"].replace("-", np.nan)
+    df["horas_trabajo_semana"] = pd.to_numeric(df["horas_trabajo_semana"], errors="coerce")
+    registrar("3. numericos", "horas_trabajo_semana", "'-' a nulo y convertir a número", n_guion,
+              "El guion impide calcular con la columna; se vuelve nulo y en el paso 8 se pone 0 "
+              "a quienes no trabajan (todos los guiones son de estudiantes con trabaja = 'no').")
+
+    # distancia_km 
+    # Ya es numérica, pero usa 999 como código de 'sin dato'
+    n_999 = (df["distancia_km"] == 999).sum()
+    df.loc[df["distancia_km"] == 999, "distancia_km"] = np.nan
+    registrar("3. numericos", "distancia_km", "999 a nulo", n_999,
+              "999 km es un código de relleno, no una distancia real; si se deja, infla la distancia promedio.")
+
+    # Verificación
+    print("Tipos después de convertir:")
+    print(df[["asistencia_pct", "horas_trabajo_semana", "distancia_km"]].dtypes)
+    print("\nNulos después de convertir:")
+    print(df[["asistencia_pct", "horas_trabajo_semana", "distancia_km"]].isnull().sum())
+
     return df
 
 

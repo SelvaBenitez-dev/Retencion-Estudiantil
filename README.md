@@ -123,4 +123,52 @@ a. Las columnas identificadas que deberían ser numéricas en lugar de str son: 
 b. El promedio excede el límite de 0 <= x <= 5, siendo el promedio máximo `78.00`
 c. Edad: Se registró una edad máxima de `150.00` (dato que no debe pertenecer en un registro estudiantil en este caso.)
 d. Variantes en la escritura: Leyendo directamente datos_estudiantes.csv, hay instancias donde las palabras tienen o no tílde, en el caso de "psicología" también hay "psicologia". Por otro lado, en género, hay casos "Femenino" y "femenino".
+
 1. 
+
+Conteos hechos sobre el dataset original, antes de corregir nada (10.150 filas).
+
+| Tipo de problema | Columna | Filas |
+|---|---|---|
+| Nulo real | promedio_acumulado | 304 |
+| Nulo real | distancia_km | 199 |
+| Nulo real | ciudad_procedencia | 103 |
+| Nulo real | tipo_colegio | 152 |
+| Nulo esperado (no es error) | motivo_retiro | 6.877 |
+| Faltante disfrazado (`-`) | asistencia_pct | 202 |
+| Faltante disfrazado (`-`) | horas_trabajo_semana | 2.822 |
+| Faltante disfrazado (999) | distancia_km | 152 |
+| Formato inconsistente (símbolo %) | asistencia_pct | 300 |
+| Formato inconsistente (fechas DD/MM/AAAA) | fecha_matricula | 3.052 |
+| Duplicado | todas las columnas | 150 |
+| Valor imposible (fuera de 15 a 60) | edad | 12 |
+| Valor imposible (mayor a 5) | promedio_acumulado | 17 |
+| Valor imposible (más de 100 horas) | horas_trabajo_semana | 30 |
+
+**Errores tipográficos:**
+- `programa`: Ingenieria de Sistemas, Psicologia (sin tilde).
+- `jornada`: diurna, nocturna, NOCTURNA (minúsculas, mayúsculas y espacio al final).
+- `genero`: M, F, femenino.
+- `ciudad_procedencia`: BOGOTÁ, Bogota, bogota, medellin, Medellin.
+
+**Lectura del diagnóstico:**
+- El problema que más afecta el análisis es que `asistencia_pct` y `horas_trabajo_semana` estén guardadas como texto, mientras sigan así no se puede calcular ninguna tasa ni promedio con ellas.
+- Los 17 promedios entre 45 y 78 están en otra escala e inflarían la media de su grupo.
+- Los 6.877 nulos de `motivo_retiro` no son errores: la columna solo aplica a los desertores, y ningún desertor la tiene vacía.
+- Los 2.822 guiones de `horas_trabajo_semana` son todos de estudiantes que no trabajan, así que en realidad significan 0 horas.
+- Las 150 filas duplicadas también repiten el `id_estudiante`, así que son el mismo registro cargado dos veces.
+
+2. 
+
+Todas las decisiones están registradas en `Data/processed/decisiones.csv`, con el número de filas afectadas y su justificación.
+
+**Paso 3: conversión a números**
+
+| Columna | Acción | Filas | Justificación |
+|---|---|---|---|
+| asistencia_pct | Quitar el símbolo % | 300 | El % es formato, no dato; impide tratar la columna como número. |
+| asistencia_pct | `-` a nulo y convertir a número | 202 | El guion es un faltante disfrazado; debe ser un nulo real. |
+| horas_trabajo_semana | `-` a nulo y convertir a número | 2.822 | Todos los guiones son de estudiantes que no trabajan; en el paso 8 se les pone 0. |
+| distancia_km | 999 a nulo | 152 | 999 es un código de relleno; si se deja, infla la distancia promedio. |
+
+Después de convertir, las tres columnas quedan como `float64`.
