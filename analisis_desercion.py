@@ -39,9 +39,23 @@ def explorar(df):
     Muestra la forma, los tipos y los nulos de cada columna, las estadísticas
     numéricas, y los valores de las columnas programa, jornada, genero y estado.
     Pregunta: ¿alguna columna numérica aparece como texto? ¿Por qué crees que pasa?
+
+    Respuesta: sí. asistencia_pct y horas_trabajo_semana aparecen como texto (str) porque tienen símbolos (%) o guiones (-) dentro.Además, solo con un valor no numérico es suficiente para que Pandas lea toda la columna como texto.
     """
     # TODO 1: imprimir shape, info(), describe() y value_counts() de las columnas indicadas.
-    pass
+    
+    print("\nForma (filas, columnas):", df.shape)
+    print("\nTipos de datos y nulos:")
+    df.info()
+    print("\nEstadísticas de las columnas numéricas:")
+    print(df.describe())
+    print("\nEstadísticas de promedio_acumulado:")
+    print(df["promedio_acumulado"].describe())
+    print("\nEstadísticas de edad:")
+    print(df["edad"].describe())
+    for col in ["programa", "jornada", "genero", "estado"]:
+        print(f"Valores de {col}:")
+        print(df[col].value_counts(dropna=False))
 
 
 def auditar(df):

@@ -86,3 +86,41 @@ El repositorio debe incluir:
   6. Tu respuesta a la reflexión sobre el uso de variables sensibles.
 
 El script debe ejecutarse sin errores desde cero. Cada decisión necesita una justificación, y cada conclusión debe apoyarse en un número del análisis.
+
+
+**Mis decisiones y respuestas**
+
+0. 
+
+| Columna | Tipo | Descripción | Rol |
+|---|---|---|---|
+| id_estudiante | Texto | Código que identifica a cada estudiante. | Identificación |
+| programa | Categórica | Carrera la cual cursa el estudiante. | Explicativa |
+| facultad | Categórica | Facultad a la que pertenece el programa que cursa el estudiante. | Explicativa |
+| jornada | Categórica | Horario de estudio; si es jornada diurna, nocturna o fin de semana. | Explicativa |
+| semestre | Numérica | Semestre en el que se encuentra cursando el estudiante. | Explicativa |
+| promedio_acumulado | Numérica | Nota del promedio de la carrera (0 <= x <= 5)| Explicativa |
+| creditos_aprobados | Numérica | Créditos aprobados hasta la fecha. | Explicativa |
+| materias_reprobadas | Numérica | Número de materias perdidas. | Explicativa |
+| asistencia_pct | Numérica (entra en str)| Porcentaje de asistencia a clases. Trae % y guiones. | Explicativa |
+| sesiones_tutoria | Numérica | Sesiones de tutoría a las que asistió el estudiante. | Explicativa |
+| cambios_programa | Numérica | Veces que el estudiante se ha cambiado de carrera. | Explicativa |
+| estrato | Categórica | Estrato socioeconómico de la vivienda (1 a 6). | Explicativa |
+| beca | Categórica | Indica si el estudiante recibe una beca (sí o no). | Explicativa |
+| trabaja | Categórica | Indica si el estudiante trabaja (sí o no). | Explicativa |
+| horas_trabajo_semana | Numérica (llega como str) | Horas de trabajo por semana. Trae guiones. | Explicativa |
+| distancia_km | Numérica | Distancia de la vivienda al lugar de estudio en km. | Explicativa |
+| edad | Numérica | Edad del estudiante (años). | Explicativa |
+| genero | Categórica | Género registrado: femenino o masculino. | Explicativa |
+| ciudad_procedencia | Categórica | Ciudad de origen del estudiante. | Explicativa |
+| tipo_colegio | Categórica | Tipo de colegio donde egresó el estudiante: público o privado. | Explicativa |
+| fecha_matricula | Fecha (llega como str) | Fecha de matrícula. Mezcla los formatos AAAA-MM-DD y DD/MM/AAAA. | Explicativa |
+| estado | Categórica | Situación del estudiante: activo, graduado o desertor. | Resultado |
+| motivo_retiro | Categórica | Razón del retiro; solo existe para los desertores. | Resultado |
+
+Análisis:
+a. Las columnas identificadas que deberían ser numéricas en lugar de str son: `asistencia_pct`, `horas_trabajo_semana` y `fecha_matricula`.
+b. El promedio excede el límite de 0 <= x <= 5, siendo el promedio máximo `78.00`
+c. Edad: Se registró una edad máxima de `150.00` (dato que no debe pertenecer en un registro estudiantil en este caso.)
+d. Variantes en la escritura: Leyendo directamente datos_estudiantes.csv, hay instancias donde las palabras tienen o no tílde, en el caso de "psicología" también hay "psicologia". Por otro lado, en género, hay casos "Femenino" y "femenino".
+1. 
