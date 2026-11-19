@@ -441,7 +441,16 @@ def grafico_faltantes(df):
     Pista: sns.heatmap(df.isnull(), cbar=False)
     """
     # TODO 10: dibujar, guardar en GRAFICOS / "mapa_faltantes.png" y mostrar.
-    pass
+    plt.figure(figsize=(12, 6))
+    sns.heatmap(df.isnull(), cbar=False, yticklabels=False, cmap="viridis")
+    plt.title("Mapa de faltantes del dataset original")
+    plt.xlabel("Columna")
+    plt.ylabel("Estudiantes (filas)")
+    plt.tight_layout()
+
+    GRAFICOS.mkdir(parents=True, exist_ok=True)
+    plt.savefig(GRAFICOS / "mapa_faltantes.png", dpi=120)
+    plt.show()
 
 
 def grafico_distribuciones(antes, despues):
@@ -450,7 +459,24 @@ def grafico_distribuciones(antes, despues):
     Pregunta: ¿qué cambió en cada distribución? ¿Por qué?
     """
     # TODO 11: dibujar los cuatro boxplots, guardar en GRAFICOS / "distribuciones_antes_despues.png" y mostrar.
-    pass
+    fig, ejes = plt.subplots(2, 2, figsize=(12, 7))
+
+    sns.boxplot(x=antes["promedio_acumulado"], ax=ejes[0, 0], color="salmon")
+    ejes[0, 0].set_title("Promedio acumulado: antes")
+
+    sns.boxplot(x=despues["promedio_acumulado"], ax=ejes[0, 1], color="mediumseagreen")
+    ejes[0, 1].set_title("Promedio acumulado: después")
+
+    sns.boxplot(x=antes["edad"], ax=ejes[1, 0], color="salmon")
+    ejes[1, 0].set_title("Edad: antes")
+
+    sns.boxplot(x=despues["edad"], ax=ejes[1, 1], color="mediumseagreen")
+    ejes[1, 1].set_title("Edad: después")
+
+    plt.tight_layout()
+    GRAFICOS.mkdir(parents=True, exist_ok=True)
+    plt.savefig(GRAFICOS / "distribuciones_antes_despues.png", dpi=120)
+    plt.show()
 
 
 def grafico_tasa_programa(df):
@@ -459,7 +485,18 @@ def grafico_tasa_programa(df):
     Pista: df.groupby("programa")["desertor"].mean()
     """
     # TODO 12: dibujar la tasa por programa, guardar en GRAFICOS / "tasa_desercion_por_programa.png" y mostrar.
-    pass
+    tasa = df.groupby("programa")["desertor"].mean().sort_values()
+
+    plt.figure(figsize=(10, 6))
+    tasa.plot(kind="barh", color="steelblue")
+    plt.title("Tasa de deserción por programa")
+    plt.xlabel("Proporción de desertores")
+    plt.ylabel("")
+    plt.tight_layout()
+
+    GRAFICOS.mkdir(parents=True, exist_ok=True)
+    plt.savefig(GRAFICOS / "tasa_desercion_por_programa.png", dpi=120)
+    plt.show()
 
 
 def grafico_tasa_asistencia(df):
@@ -468,7 +505,18 @@ def grafico_tasa_asistencia(df):
     Pista: df.groupby("cuartil_asistencia", observed=True)["desertor"].mean()
     """
     # TODO 13: dibujar la tasa por cuartil, guardar en GRAFICOS / "tasa_desercion_por_asistencia.png" y mostrar.
-    pass
+    tasa = df.groupby("cuartil_asistencia", observed=True)["desertor"].mean()
+
+    plt.figure(figsize=(8, 5))
+    tasa.plot(kind="bar", color="steelblue", rot=0)
+    plt.title("Tasa de deserción por cuartil de asistencia")
+    plt.xlabel("Cuartil de asistencia")
+    plt.ylabel("Proporción de desertores")
+    plt.tight_layout()
+
+    GRAFICOS.mkdir(parents=True, exist_ok=True)
+    plt.savefig(GRAFICOS / "tasa_desercion_por_asistencia.png", dpi=120)
+    plt.show()
 
 
 def responder_preguntas(df):
