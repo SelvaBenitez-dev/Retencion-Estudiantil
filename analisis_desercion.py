@@ -151,7 +151,59 @@ def unificar_categorias(df):
     con las variantes que encontraste con value_counts(). Los valores correctos están en VALIDOS.
     Pregunta: ¿qué variantes son el mismo valor? ¿Hay alguna que no debas unificar?
     """
+    print("\n4. Unificar categorías:")
     # TODO 4: unificar las escrituras de programa, jornada, genero y ciudad_procedencia.
+    diccionarios = {
+        "programa": {
+            "administración de empresas": "Administración de Empresas",
+            "contaduría pública": "Contaduría Pública",
+            "derecho": "Derecho",
+            "psicología": "Psicología",
+            "psicologia": "Psicología",                  # variante sin tilde
+            "ingeniería de sistemas": "Ingeniería de Sistemas",
+            "ingenieria de sistemas": "Ingeniería de Sistemas",  # variante sin tilde
+            "ingeniería industrial": "Ingeniería Industrial",
+            "enfermería": "Enfermería",
+            "diseño gráfico": "Diseño Gráfico",
+        },
+        "jornada": {
+            "diurna": "Diurna",
+            "nocturna": "Nocturna",                      # cubre 'nocturna' y 'NOCTURNA '
+            "fin de semana": "Fin de semana",
+        },
+        "genero": {
+            "femenino": "Femenino",
+            "f": "Femenino",                             # abreviatura
+            "masculino": "Masculino",
+            "m": "Masculino",                            # abreviatura
+        },
+        "ciudad_procedencia": {
+            "bogotá": "Bogotá",                          # cubre 'BOGOTÁ'
+            "bogota": "Bogotá",                          # cubre 'Bogota' y 'bogota '
+            "medellín": "Medellín",
+            "medellin": "Medellín",                      # cubre 'medellin' y 'Medellin '
+            "cali": "Cali",
+            "bucaramanga": "Bucaramanga",
+            "rionegro": "Rionegro",
+            "barranquilla": "Barranquilla",
+            "otra ciudad": "Otra ciudad",                # NO se unifica con ninguna ciudad
+        },
+    }
+
+    for col, diccionario in diccionarios.items():
+        antes = df[col].copy()
+        df[col] = df[col].str.strip().str.lower()        # 1. normalizar
+        df[col] = df[col].replace(diccionario)           # 2. unificar con el diccionario
+
+        cambiadas = (antes.notna() & (antes != df[col])).sum()
+        fuera = (df[col].notna() & ~df[col].isin(VALIDOS[col])).sum()
+
+        print(f"\n{col}: {cambiadas} filas corregidas | valores fuera de VALIDOS: {fuera}")
+        print(df[col].value_counts(dropna=False))
+
+        registrar("4. categorias", col, "strip + lower + replace con diccionario", cambiadas,
+                  "Mayúsculas, espacios y tildes faltantes crean grupos falsos que dividen el mismo valor.")
+
     return df
 
 

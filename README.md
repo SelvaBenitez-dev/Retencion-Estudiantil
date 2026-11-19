@@ -162,8 +162,6 @@ Conteos hechos sobre el dataset original, antes de corregir nada (10.150 filas).
 
 Todas las decisiones están registradas en `Data/processed/decisiones.csv`, con el número de filas afectadas y su justificación.
 
-**Paso 3: conversión a números**
-
 | Columna | Acción | Filas | Justificación |
 |---|---|---|---|
 | asistencia_pct | Quitar el símbolo % | 300 | El % es formato, no dato; impide tratar la columna como número. |
@@ -172,3 +170,16 @@ Todas las decisiones están registradas en `Data/processed/decisiones.csv`, con 
 | distancia_km | 999 a nulo | 152 | 999 es un código de relleno; si se deja, infla la distancia promedio. |
 
 Después de convertir, las tres columnas quedan como `float64`.
+
+3. 
+
+Se normalizó cada columna con `str.strip()` y `str.lower()`, y después se tradujo cada variante a su forma correcta con un diccionario basado en `VALIDOS`.
+
+| Columna | Variantes corregidas | Filas |
+|---|---|---|
+| programa | Ingenieria de Sistemas, Psicologia | 260 |
+| jornada | diurna, nocturna, NOCTURNA (con espacio) | 485 |
+| genero | M, F, femenino | 559 |
+| ciudad_procedencia | BOGOTÁ, Bogota, bogota, medellin, Medellin | 542 |
+
+Justificación: las variantes de escritura crean grupos falsos que dividen el mismo valor; por ejemplo, Psicología aparecía partida en 1.065 + 116 estudiantes. Después de unificar, todos los valores coinciden con la lista de válidos. No se unificó "Otra ciudad" con ninguna ciudad, y los 103 nulos de ciudad se tratan en el paso 7.
