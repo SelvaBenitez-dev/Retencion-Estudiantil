@@ -182,4 +182,63 @@ Se normalizó cada columna con `str.strip()` y `str.lower()`, y después se trad
 | genero | M, F, femenino | 559 |
 | ciudad_procedencia | BOGOTÁ, Bogota, bogota, medellin, Medellin | 542 |
 
-Justificación: las variantes de escritura crean grupos falsos que dividen el mismo valor; por ejemplo, Psicología aparecía partida en 1.065 + 116 estudiantes. Después de unificar, todos los valores coinciden con la lista de válidos. No se unificó "Otra ciudad" con ninguna ciudad, y los 103 nulos de ciudad se tratan en el paso 7.
+Justificación: las variantes de escritura crean grupos falsos que dividen el mismo valor; por ejemplo, Psicología aparecía partida en 1.065 + 116 estudiantes. Después de unificar, todos los valores coinciden con la lista de válidos. No se unificó "Otra ciudad" con ninguna ciudad, y los 103 nulos de ciudad se tratan en el paso 7. 
+
+4. 
+
+**Paso 5: fechas**
+
+| Columna | Acción | Filas | Justificación |
+|---|---|---|---|
+| fecha_matricula | Convertir los dos formatos a fecha | 3.052 en DD/MM/AAAA | Con formatos mezclados la columna no se puede usar como fecha. Se convirtió cada formato por separado con `pd.to_datetime(format=..., errors="coerce")` y se juntaron con `fillna()`. El formato explícito evita confundir día y mes. |
+
+Después de la conversión, la columna queda como `datetime64` y ninguna fecha quedó sin convertir.
+
+5. 
+**Paso 6: duplicados**
+
+| Columna | Acción | Filas | Justificación |
+|---|---|---|---|
+| todas | Eliminar filas idénticas con `drop_duplicates()` y renumerar con `reset_index(drop=True)` | 150 | Las 150 filas duplicadas repiten también el `id_estudiante`, así que son el mismo registro cargado dos veces y no dos estudiantes distintos. Si se dejaran, esos estudiantes contarían doble en las tasas. |
+
+El dataset pasa de 10.150 a 10.000 filas, y ya no queda ningún `id_estudiante` repetido.
+
+6. 
+**Paso 7: faltantes**
+
+| Columna | Acción | Filas | Justificación |
+|---|---|---|---|
+| promedio_acumulado | Eliminar filas | 298 | Una nota no se puede inventar. Imputar la media acercaría todos los grupos al promedio general y escondería las diferencias. Se pierde el 3 % de las filas. |
+| ciudad_procedencia | Rellenar con "Sin dato" | 96 | Es un dato descriptivo. Eliminar la fila haría perder al estudiante en las demás preguntas. |
+| tipo_colegio | Rellenar con "Sin dato" | 145 | Igual que la ciudad. |
+| motivo_retiro | Dejar los nulos | 6.562 | Nulo esperado: solo aplica a desertores, y ningún desertor lo tiene vacío. |
+| asistencia_pct | Dejar los nulos | 197 | Es la variable de la pregunta 5; imputarla inventaría la relación que se quiere medir. Quedan fuera de los cuartiles. |
+| distancia_km | Dejar los nulos | 334 | No se usa en las cinco preguntas. |
+
+Los nulos de `horas_trabajo_semana` se tratan en el paso 8. Después de este paso quedan 9.702 filas.
+
+7. **Paso 8: valores imposibles**
+
+Primero se marcó cada valor imposible como nulo con `loc`, y después se trató como cualquier otro nulo.
+
+| Columna | Acción | Filas | Justificación |
+|---|---|---|---|
+| edad | Fuera de 15 a 60 → mediana de las edades válidas (22) | 12 | Edades de 12 y 150 años son errores de registro. La mediana no se ve afectada por los extremos y así no se pierde la fila. |
+| promedio_acumulado | Mayores a 5 → nulo → eliminar fila | 15 | Valores de 45, 62 y 78 son imposibles en la escala 0 a 5. No se puede confirmar la escala original, así que se tratan como un faltante: una nota no se inventa. |
+| horas_trabajo_semana | Nulos con `trabaja = "no"` → 0 | 2.703 | Todos los guiones originales eran de estudiantes que no trabajan, así que significaban 0 horas. |
+| horas_trabajo_semana | Mayores a 100 → mediana de quienes trabajan (24) | 29 | Más de 100 horas por semana no deja tiempo para estudiar ni dormir. Se usa la mediana de quienes trabajan para no contar los ceros. |
+
+Después de este paso quedan 9.687 filas. La edad queda entre 17 y 29 años, el promedio entre 1,17 y 5,00, y las horas entre 0 y 40, sin nulos.
+
+
+8. **Paso 9: variables nuevas**
+
+| Columna nueva | Cómo se creó | Filas | Justificación |
+|---|---|---|---|
+| desertor | `df["estado"].eq("desertor")` | 3.136 desertores de 9.687 (32,4 %) | Una columna True/False permite calcular la tasa de deserción con `mean()`, porque el promedio de True y False es la proporción de True. |
+| cuartil_asistencia | `pd.qcut(asistencia_pct, 4)` con etiquetas Q1 a Q4 | 9.490 (197 sin asistencia quedan fuera) | Con valores exactos habría cientos de grupos pequeños con tasas inestables. Los cuartiles crean 4 grupos de tamaño parecido (unos 2.350 a 2.390 estudiantes cada uno), así que la comparación es confiable. |
+
+El dataset limpio queda con 9.687 filas y 25 columnas.
+
+9.
+

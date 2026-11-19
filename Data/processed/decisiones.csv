@@ -7,3 +7,17 @@ paso,columna,accion,filas_afectadas,justificacion
 4. categorias,jornada,strip + lower + replace con diccionario,485,"Mayúsculas, espacios y tildes faltantes crean grupos falsos que dividen el mismo valor."
 4. categorias,genero,strip + lower + replace con diccionario,559,"Mayúsculas, espacios y tildes faltantes crean grupos falsos que dividen el mismo valor."
 4. categorias,ciudad_procedencia,strip + lower + replace con diccionario,542,"Mayúsculas, espacios y tildes faltantes crean grupos falsos que dividen el mismo valor."
+5. fechas,fecha_matricula,convertir DD/MM/AAAA y AAAA-MM-DD a fecha,3052,Con formatos mezclados Pandas no puede leer la columna como fecha; con formato explícito no se confunden día y mes (03/04 podría ser 3 de abril o 4 de marzo).
+6. duplicados,todas,eliminar filas idénticas,150,Son filas idénticas incluido el id_estudiante (150 ids repetidos); contarlas dos veces duplicaría a esos estudiantes en las tasas.
+7. faltantes,promedio_acumulado,eliminar filas,298,Una nota no se puede inventar; imputar la media acercaría todos los grupos al promedio general y escondería las diferencias que se quieren medir.
+7. faltantes,ciudad_procedencia,rellenar con 'Sin dato',96,"Es un dato descriptivo; eliminar la fila haría perder al estudiante en las demás preguntas, y 'Sin dato' deja claro que la información falta."
+7. faltantes,tipo_colegio,rellenar con 'Sin dato',145,"Es un dato descriptivo; eliminar la fila haría perder al estudiante en las demás preguntas, y 'Sin dato' deja claro que la información falta."
+7. faltantes,motivo_retiro,dejar los nulos,6562,"Nulo esperado: la columna solo aplica a desertores, y 0 desertores la tienen vacía. Activos y graduados no tienen motivo de retiro."
+7. faltantes,asistencia_pct,dejar los nulos,197,Es la variable de la pregunta 5; imputarla inventaría la relación que se quiere medir. Estas filas quedan fuera de los cuartiles.
+7. faltantes,distancia_km,dejar los nulos,334,No se usa en las cinco preguntas; imputarla no aporta y ocultaría que el dato falta.
+8. imposibles,edad,fuera de 15-60 a la mediana (22),12,Edades de 12 y 150 años son errores de registro; la mediana de las edades válidas no se ve afectada por esos extremos.
+8. imposibles,promedio_acumulado,mayores a 5 a nulo y eliminar fila,15,"Valores de 45 a 78 son imposibles en la escala 0-5. No se puede confirmar la escala original, así que se tratan igual que un faltante: una nota no se inventa."
+8. imposibles,horas_trabajo_semana,nulo con trabaja='no' a 0,2703,"Quien no trabaja tiene 0 horas de trabajo; todos los guiones originales eran de estudiantes con trabaja = 'no', así que el guion significaba cero."
+8. imposibles,horas_trabajo_semana,mayores a 100 a la mediana de quienes trabajan (24),29,Más de 100 horas semanales no deja tiempo para estudiar ni dormir; la mediana de quienes trabajan representa el valor típico sin contar los ceros.
+9. variables,desertor,crear columna True/False,3136,"Una columna True/False permite calcular la tasa de deserción con mean(), porque el promedio de True y False es la proporción de True."
+9. variables,cuartil_asistencia,crear cuartiles con qcut,9490,Cuatro grupos de tamaño parecido permiten comparar tasas de forma estable; los estudiantes sin asistencia quedan fuera de los cuartiles.

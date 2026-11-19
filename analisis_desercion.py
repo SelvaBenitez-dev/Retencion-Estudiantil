@@ -213,7 +213,30 @@ def convertir_fechas(df):
     Pista: intenta el formato AAAA-MM-DD y luego DD/MM/AAAA, cada uno con errors="coerce",
     y junta los resultados con fillna(). Registra cuántas fechas tenían el segundo formato.
     """
-    # TODO 5: convertir fecha_matricula a fecha con los dos formatos.
+    print("\n5. Convertir fechas:")
+    # TODO 5: convertir fecha_matricula a tipo fecha, registrar cuántas
+    # 1. Contar ANTES de convertir cuántas fechas vienen en DD/MM/AAAA
+    n_latinas = df["fecha_matricula"].str.contains("/", regex=False).sum()
+
+    # 2. Intentar cada formato por separado (lo que no coincide queda como NaT)
+    fechas_iso = pd.to_datetime(df["fecha_matricula"], format="%Y-%m-%d", errors="coerce")
+    fechas_latinas = pd.to_datetime(df["fecha_matricula"], format="%d/%m/%Y", errors="coerce")
+
+    # 3. Juntar: donde la primera quedó vacía, usar la segunda
+    df["fecha_matricula"] = fechas_iso.fillna(fechas_latinas)
+
+    # 4. Verificar
+    sin_convertir = df["fecha_matricula"].isnull().sum()
+    print("Fechas en formato DD/MM/AAAA convertidas:", n_latinas)
+    print("Fechas que quedaron sin convertir:", sin_convertir)
+    print("Tipo de la columna:", df["fecha_matricula"].dtype)
+    print("Fecha más antigua:", df["fecha_matricula"].min())
+    print("Fecha más reciente:", df["fecha_matricula"].max())
+
+    registrar("5. fechas", "fecha_matricula", "convertir DD/MM/AAAA y AAAA-MM-DD a fecha", n_latinas,
+              "Con formatos mezclados Pandas no puede leer la columna como fecha; con formato "
+              "explícito no se confunden día y mes (03/04 podría ser 3 de abril o 4 de marzo).")
+
     return df
 
 
@@ -222,8 +245,27 @@ def eliminar_duplicados(df):
 
     Pregunta: ¿podrían existir dos estudiantes distintos con todos los datos iguales?
     Pista: duplicated() y drop_duplicates(), con reset_index(drop=True).
+
+    Respuesta: no podrían existir dos estudiantes distintos con todos los datos
+    iguales, porque id_estudiante los diferenciaría, es el mismo registro cargado dos veces.
     """
     # TODO 6: eliminar duplicados, registrar la decisión y devolver el dataframe.
+    
+    print("\n6. Eliminar duplicados:")
+
+    filas_antes = len(df)
+    n_duplicados = df.duplicated().sum()                 # 1. contar
+    df = df.drop_duplicates().reset_index(drop=True)     # 2. eliminar y renumerar
+
+    print("Filas antes:", filas_antes)
+    print("Filas duplicadas eliminadas:", n_duplicados)
+    print("Filas después:", len(df))
+    print("Ids repetidos que quedan:", df["id_estudiante"].duplicated().sum())
+
+    registrar("6. duplicados", "todas", "eliminar filas idénticas", n_duplicados,   # 3. registrar
+              "Son filas idénticas incluido el id_estudiante (150 ids repetidos); contarlas "
+              "dos veces duplicaría a esos estudiantes en las tasas.")
+
     return df
 
 
@@ -234,8 +276,57 @@ def tratar_faltantes(df):
     - ¿Puedes inventar una nota? ¿Qué pasa si imputas el promedio?
     - Para ciudad o tipo de colegio, ¿conviene eliminar la fila o marcar el dato como 'Sin dato'?
     - motivo_retiro tiene muchos nulos. ¿Son errores? (Pista: ¿para quiénes aplica esa columna?)
+
+     Respuestas:
+    - No se puede inventar una nota. Si se imputa el promedio, todos los grupos se
+    acercan artificialmente a la media general y se esconden las diferencias.
+    - Para ciudad y tipo de colegio conviene marcar 'Sin dato': así no se pierde al
+    estudiante en las preguntas que no usan esas columnas.
+    - Los nulos de motivo_retiro no son errores: la columna solo aplica a desertores.
     """
     # TODO 7: tratar los nulos de promedio_acumulado, ciudad_procedencia y tipo_colegio.
+   
+    print("\npaso 7. Tratar faltantes:")
+
+    #  promedio_acumulado: eliminar filas
+    n = df["promedio_acumulado"].isnull().sum()
+    df = df.dropna(subset=["promedio_acumulado"]).reset_index(drop=True)
+    registrar("7. faltantes", "promedio_acumulado", "eliminar filas", n,
+              "Una nota no se puede inventar; imputar la media acercaría todos los grupos "
+              "al promedio general y escondería las diferencias que se quieren medir.")
+
+    # ── ciudad_procedencia y tipo_colegio: rellenar con 'Sin dato' ─
+    for col in ["ciudad_procedencia", "tipo_colegio"]:
+        n = df[col].isnull().sum()
+        df[col] = df[col].fillna("Sin dato")
+        registrar("7. faltantes", col, "rellenar con 'Sin dato'", n,
+                  "Es un dato descriptivo; eliminar la fila haría perder al estudiante "
+                  "en las demás preguntas, y 'Sin dato' deja claro que la información falta.")
+
+    # motivo_retiro: dejar los nulos (son esperados)
+    n = df["motivo_retiro"].isnull().sum()
+    desertores_sin_motivo = (df["estado"].eq("desertor") & df["motivo_retiro"].isnull()).sum()
+    registrar("7. faltantes", "motivo_retiro", "dejar los nulos", n,
+              f"Nulo esperado: la columna solo aplica a desertores, y {desertores_sin_motivo} "
+              "desertores la tienen vacía. Activos y graduados no tienen motivo de retiro.")
+
+    # asistencia_pct: dejar los nulos
+    n = df["asistencia_pct"].isnull().sum()
+    registrar("7. faltantes", "asistencia_pct", "dejar los nulos", n,
+              "Es la variable de la pregunta 5; imputarla inventaría la relación que se "
+              "quiere medir. Estas filas quedan fuera de los cuartiles.")
+
+    # distancia_km: dejar los nulos
+    n = df["distancia_km"].isnull().sum()
+    registrar("7. faltantes", "distancia_km", "dejar los nulos", n,
+              "No se usa en las cinco preguntas; imputarla no aporta y ocultaría que el dato falta.")
+
+    # Verificación
+    print("Filas después de eliminar promedios faltantes:", len(df))
+    print("Desertores sin motivo_retiro:", desertores_sin_motivo)
+    print("\nNulos que quedan:")
+    print(df.isnull().sum()[df.isnull().sum() > 0])
+
     return df
 
 
@@ -246,8 +337,61 @@ def tratar_imposibles(df):
     - La escala del promedio es de 0 a 5. ¿Qué harías con un 45?
     - Una edad de 150 años es un error. ¿Qué valor pondrías en su lugar?
     - Si el estudiante no trabaja, ¿cuántas horas de trabajo tiene? ¿Cómo lo aplicas en código?
+
+    Respuestas:
+    - Un promedio de 45 en escala 0-5 se convierte en nulo y se elimina la fila, igual que los promedios faltantes: no se puede confirmar en qué escala se registró.
+    - Una edad imposible se reemplaza por la mediana de las edades válidas.
+    - Si el estudiante no trabaja, sus horas son 0; se aplica con loc y una condición que combina trabaja == 'no' y horas nulas.
+
     """
     # TODO 8: tratar edad, promedio_acumulado y horas_trabajo_semana, con sus justificaciones.
+ 
+    print("\npaso 8. Tratar imposibles:")
+
+    # edad 
+    imposible = (df["edad"] < 15) | (df["edad"] > 60)
+    n = imposible.sum()
+    df["edad"] = df["edad"].astype("float64")            # para poder guardar nulos
+    df.loc[imposible, "edad"] = np.nan                   # 1. marcar como nulo
+    mediana_edad = df["edad"].median()                   # 2. mediana SOLO con edades válidas
+    df["edad"] = df["edad"].fillna(mediana_edad)         # 3. rellenar
+    registrar("8. imposibles", "edad", f"fuera de 15-60 a la mediana ({mediana_edad:.0f})", n,
+              "Edades de 12 y 150 años son errores de registro; la mediana de las edades "
+              "válidas no se ve afectada por esos extremos.")
+
+    #  promedio_acumulado 
+    imposible = df["promedio_acumulado"] > 5
+    n = imposible.sum()
+    df.loc[imposible, "promedio_acumulado"] = np.nan
+    df = df.dropna(subset=["promedio_acumulado"]).reset_index(drop=True)
+    registrar("8. imposibles", "promedio_acumulado", "mayores a 5 a nulo y eliminar fila", n,
+              "Valores de 45 a 78 son imposibles en la escala 0-5. No se puede confirmar la "
+              "escala original, así que se tratan igual que un faltante: una nota no se inventa.")
+
+    # horas_trabajo_semana: regla que depende de otra columna 
+    sin_trabajo = (df["trabaja"] == "no") & (df["horas_trabajo_semana"].isnull())
+    n = sin_trabajo.sum()
+    df.loc[sin_trabajo, "horas_trabajo_semana"] = 0
+    registrar("8. imposibles", "horas_trabajo_semana", "nulo con trabaja='no' a 0", n,
+              "Quien no trabaja tiene 0 horas de trabajo; todos los guiones originales eran "
+              "de estudiantes con trabaja = 'no', así que el guion significaba cero.")
+
+    # horas_trabajo_semana: valores mayores a 100 
+    imposible = df["horas_trabajo_semana"] > 100
+    n = imposible.sum()
+    df.loc[imposible, "horas_trabajo_semana"] = np.nan
+    mediana_horas = df.loc[df["trabaja"] == "sí", "horas_trabajo_semana"].median()
+    df["horas_trabajo_semana"] = df["horas_trabajo_semana"].fillna(mediana_horas)
+    registrar("8. imposibles", "horas_trabajo_semana",
+              f"mayores a 100 a la mediana de quienes trabajan ({mediana_horas:.0f})", n,
+              "Más de 100 horas semanales no deja tiempo para estudiar ni dormir; la mediana "
+              "de quienes trabajan representa el valor típico sin contar los ceros.")
+
+    # Verificación
+    print("Filas después del paso 8:", len(df))
+    print(df[["edad", "promedio_acumulado", "horas_trabajo_semana"]].describe())
+    print("\nNulos que quedan en horas_trabajo_semana:", df["horas_trabajo_semana"].isnull().sum())
+
     return df
 
 
@@ -258,8 +402,36 @@ def crear_variables(df):
     - desertor: True si estado es 'desertor', False si no.
     - cuartil_asistencia: divide asistencia_pct en cuatro grupos iguales con pd.qcut.
     Pregunta: ¿por qué conviene usar cuartiles y no valores exactos de asistencia?
+
+    Respuesta: con valores exactos habría cientos de grupos de pocos estudiantes y sus
+    tasas serían inestables. Con cuartiles cada grupo tiene cerca de una cuarta parte
+    de los estudiantes, así que la comparación es confiable.
     """
     # TODO 9: crear las columnas desertor y cuartil_asistencia.
+    
+    print("\npaso 9. Crear variables nuevas:")
+
+    #desertor: True / False 
+    df["desertor"] = df["estado"].eq("desertor")
+    n_desertores = df["desertor"].sum()
+    print(f"Desertores: {n_desertores} de {len(df)} estudiantes "
+          f"({df['desertor'].mean():.1%})")
+    registrar("9. variables", "desertor", "crear columna True/False", n_desertores,
+              "Una columna True/False permite calcular la tasa de deserción con mean(), "
+              "porque el promedio de True y False es la proporción de True.")
+
+    #cuartil_asistencia: 4 grupos de tamaño parecido 
+    df["cuartil_asistencia"] = pd.qcut(df["asistencia_pct"], 4,
+                                       labels=["Q1 (más baja)", "Q2", "Q3", "Q4 (más alta)"])
+    n_con_cuartil = df["cuartil_asistencia"].notna().sum()
+    print("\nEstudiantes por cuartil:")
+    print(df["cuartil_asistencia"].value_counts(dropna=False).sort_index())
+    print("\nRango de asistencia de cada cuartil:")
+    print(df.groupby("cuartil_asistencia", observed=True)["asistencia_pct"].agg(["min", "max"]))
+    registrar("9. variables", "cuartil_asistencia", "crear cuartiles con qcut", n_con_cuartil,
+              "Cuatro grupos de tamaño parecido permiten comparar tasas de forma estable; "
+              "los estudiantes sin asistencia quedan fuera de los cuartiles.")
+
     return df
 
 
