@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retención estudiantil</title>
+  <!-- Los estilos están en un archivo aparte -->
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+  <!-- ===================== ENCABEZADO ===================== -->
+  <header>
+    <div class="contenedor">
+      <span class="etiqueta">Proyecto integrador · Pandas</span>
+      <h1>Calidad de datos para la retención estudiantil</h1>
+      <p class="subtitulo">Auditoría, limpieza y documentación de un dataset sintético de estudiantes, y respuesta a las cinco preguntas de la institución con los datos limpios.</p>
+
+      <div class="cifras">
+        <div class="cifra"><strong>10.150</strong><span>filas en el dataset original</span></div>
+        <div class="cifra"><strong>9.687</strong><span>filas en el dataset limpio</span></div>
+        <div class="cifra"><strong>22</strong><span>decisiones registradas</span></div>
+        <div class="cifra"><strong>32,4 %</strong><span>tasa global de deserción</span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== MENÚ ===================== -->
+  <nav>
+    <div class="contenedor">
+      <a href="#diccionario">0. Diccionario</a>
+      <a href="#diagnostico">1. Diagnóstico</a>
+      <a href="#decisiones">2. Decisiones</a>
+      <a href="#graficos">Gráficos</a>
+      <a href="#preguntas">3. Preguntas</a>
+      <a href="#causalidad">4. Causalidad</a>
+      <a href="#prediccion">5. Predicción</a>
+      <a href="#sensibles">6. Variables sensibles</a>
+    </div>
+  </nav>
+
+  <main class="contenedor">
+
+    <!-- ===================== 0. DICCIONARIO ===================== -->
+    <section id="diccionario">
+      <h2><span class="numero">0</span>Diccionario de datos</h2>
+      <p class="intro">Las 23 columnas del dataset, con su tipo, su significado y su rol en el análisis.</p>
+
+      <div class="tabla-scroll">
+        <table>
+          <thead>
+            <tr><th>Columna</th><th>Tipo</th><th>Descripción</th><th>Rol</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>id_estudiante</code></td><td>Texto</td><td>Código único que identifica a cada estudiante.</td><td>Identificación</td></tr>
+            <tr><td><code>programa</code></td><td>Categórica</td><td>Carrera que cursa el estudiante.</td><td>Explicativa</td></tr>
+            <tr><td><code>facultad</code></td><td>Categórica</td><td>Facultad a la que pertenece el programa.</td><td>Explicativa</td></tr>
+            <tr><td><code>jornada</code></td><td>Categórica</td><td>Horario de estudio: diurna, nocturna o fin de semana.</td><td>Explicativa</td></tr>
+            <tr><td><code>semestre</code></td><td>Numérica</td><td>Semestre que cursa el estudiante.</td><td>Explicativa</td></tr>
+            <tr><td><code>promedio_acumulado</code></td><td>Numérica</td><td>Nota promedio de la carrera, en escala de 0 a 5.</td><td>Explicativa</td></tr>
+            <tr><td><code>creditos_aprobados</code></td><td>Numérica</td><td>Créditos académicos aprobados hasta la fecha.</td><td>Explicativa</td></tr>
+            <tr><td><code>materias_reprobadas</code></td><td>Numérica</td><td>Número de materias perdidas.</td><td>Explicativa</td></tr>
+            <tr><td><code>asistencia_pct</code></td><td>Numérica (llega como texto)</td><td>Porcentaje de asistencia a clases. Trae símbolos % y guiones.</td><td>Explicativa</td></tr>
+            <tr><td><code>sesiones_tutoria</code></td><td>Numérica</td><td>Sesiones de tutoría a las que asistió.</td><td>Explicativa</td></tr>
+            <tr><td><code>cambios_programa</code></td><td>Numérica</td><td>Veces que el estudiante se cambió de carrera.</td><td>Explicativa</td></tr>
+            <tr><td><code>estrato</code></td><td>Categórica ordinal</td><td>Estrato socioeconómico de la vivienda (1 a 6).</td><td>Explicativa (sensible)</td></tr>
+            <tr><td><code>beca</code></td><td>Categórica</td><td>Indica si el estudiante recibe una beca (sí o no).</td><td>Explicativa</td></tr>
+            <tr><td><code>trabaja</code></td><td>Categórica</td><td>Indica si el estudiante trabaja (sí o no).</td><td>Explicativa</td></tr>
+            <tr><td><code>horas_trabajo_semana</code></td><td>Numérica (llega como texto)</td><td>Horas de trabajo por semana. Trae guiones.</td><td>Explicativa</td></tr>
+            <tr><td><code>distancia_km</code></td><td>Numérica</td><td>Distancia de la vivienda a la sede, en km. Usa 999 como "sin dato".</td><td>Explicativa</td></tr>
+            <tr><td><code>edad</code></td><td>Numérica</td><td>Edad del estudiante en años.</td><td>Explicativa</td></tr>
+            <tr><td><code>genero</code></td><td>Categórica</td><td>Género registrado: femenino o masculino.</td><td>Explicativa (sensible)</td></tr>
+            <tr><td><code>ciudad_procedencia</code></td><td>Categórica</td><td>Ciudad de origen del estudiante.</td><td>Explicativa (sensible)</td></tr>
+            <tr><td><code>tipo_colegio</code></td><td>Categórica</td><td>Tipo de colegio de bachillerato: público o privado.</td><td>Explicativa</td></tr>
+            <tr><td><code>fecha_matricula</code></td><td>Fecha (llega como texto)</td><td>Fecha de matrícula. Mezcla los formatos AAAA-MM-DD y DD/MM/AAAA.</td><td>Explicativa</td></tr>
+            <tr><td><code>estado</code></td><td>Categórica</td><td>Situación del estudiante: activo, graduado o desertor.</td><td>Resultado</td></tr>
+            <tr><td><code>motivo_retiro</code></td><td>Categórica</td><td>Razón del retiro; solo existe para los desertores.</td><td>Resultado</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== 1. DIAGNÓSTICO ===================== -->
+    <section id="diagnostico">
+      <h2><span class="numero">1</span>Diagnóstico de calidad</h2>
+      <p class="intro">Conteos hechos sobre el dataset original (10.150 filas), antes de corregir nada.</p>
+
+      <div class="tabla-scroll">
+        <table>
+          <thead>
+            <tr><th>Tipo de problema</th><th>Columna</th><th>Filas</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Nulo real</td><td><code>promedio_acumulado</code></td><td>304</td></tr>
+            <tr><td>Nulo real</td><td><code>distancia_km</code></td><td>199</td></tr>
+            <tr><td>Nulo real</td><td><code>ciudad_procedencia</code></td><td>103</td></tr>
+            <tr><td>Nulo real</td><td><code>tipo_colegio</code></td><td>152</td></tr>
+            <tr><td>Nulo esperado (no es error)</td><td><code>motivo_retiro</code></td><td>6.877</td></tr>
+            <tr><td>Faltante disfrazado ( - )</td><td><code>asistencia_pct</code></td><td>202</td></tr>
+            <tr><td>Faltante disfrazado ( - )</td><td><code>horas_trabajo_semana</code></td><td>2.822</td></tr>
+            <tr><td>Faltante disfrazado (999)</td><td><code>distancia_km</code></td><td>152</td></tr>
+            <tr><td>Formato inconsistente (símbolo %)</td><td><code>asistencia_pct</code></td><td>300</td></tr>
+            <tr><td>Formato inconsistente (fechas DD/MM/AAAA)</td><td><code>fecha_matricula</code></td><td>3.052</td></tr>
+            <tr><td>Duplicado</td><td>todas las columnas</td><td>150</td></tr>
+            <tr><td>Valor imposible (fuera de 15 a 60)</td><td><code>edad</code></td><td>12</td></tr>
+            <tr><td>Valor imposible (mayor a 5)</td><td><code>promedio_acumulado</code></td><td>17</td></tr>
+            <tr><td>Valor imposible (más de 100 horas)</td><td><code>horas_trabajo_semana</code></td><td>30</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Errores tipográficos</h3>
+      <ul>
+        <li><code>programa</code>: Ingenieria de Sistemas y Psicologia, sin tilde.</li>
+        <li><code>jornada</code>: diurna, nocturna y NOCTURNA con un espacio al final.</li>
+        <li><code>genero</code>: M, F y femenino.</li>
+        <li><code>ciudad_procedencia</code>: BOGOTÁ, Bogota, bogota, medellin y Medellin.</li>
+      </ul>
+
+      <h3>Lectura del diagnóstico</h3>
+      <p>El problema que más afecta el análisis es que <code>asistencia_pct</code> y <code>horas_trabajo_semana</code> estén guardadas como texto: así no se puede calcular ninguna tasa ni promedio con ellas. Los 17 promedios entre 45 y 78 están en otra escala e inflarían la media de su grupo.</p>
+      <p>Los 6.877 nulos de <code>motivo_retiro</code> no son errores: la columna solo aplica a los desertores, y ningún desertor la tiene vacía. Los 2.822 guiones de <code>horas_trabajo_semana</code> son todos de estudiantes que no trabajan, así que significan 0 horas. Las 150 filas duplicadas también repiten el <code>id_estudiante</code>: son el mismo registro cargado dos veces.</p>
+    </section>
+
+    <!-- ===================== 2. DECISIONES ===================== -->
+    <section id="decisiones">
+      <h2><span class="numero">2</span>Decisiones de limpieza</h2>
+      <p class="intro">Cada decisión quedó registrada con <code>registrar()</code>. Los archivos completos están aparte, en la carpeta <code>Data/processed/</code>:</p>
+
+      <div class="botones">
+        <a class="boton" href="Data/processed/decisiones.csv" download>⬇ decisiones.csv</a>
+        <a class="boton" href="Data/processed/dataset_limpio.csv" download>⬇ dataset_limpio.csv</a>
+      </div>
+      <p class="nota"><code>dataset_limpio.csv</code> no se sube a GitHub (está en el <code>.gitignore</code>); se crea al ejecutar <code>analisis_desercion.py</code>.</p>
+
+      <div class="tabla-scroll">
+        <table>
+          <thead>
+            <tr><th>Paso</th><th>Columna</th><th>Acción</th><th>Filas</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>3. Números</td><td><code>asistencia_pct</code></td><td>Quitar el símbolo %</td><td>300</td></tr>
+            <tr><td>3. Números</td><td><code>asistencia_pct</code></td><td>"-" a nulo y convertir a número</td><td>202</td></tr>
+            <tr><td>3. Números</td><td><code>horas_trabajo_semana</code></td><td>"-" a nulo y convertir a número</td><td>2.822</td></tr>
+            <tr><td>3. Números</td><td><code>distancia_km</code></td><td>999 a nulo</td><td>152</td></tr>
+            <tr><td>4. Categorías</td><td><code>programa</code></td><td>strip + lower + diccionario de variantes</td><td>260</td></tr>
+            <tr><td>4. Categorías</td><td><code>jornada</code></td><td>strip + lower + diccionario de variantes</td><td>485</td></tr>
+            <tr><td>4. Categorías</td><td><code>genero</code></td><td>strip + lower + diccionario de variantes</td><td>559</td></tr>
+            <tr><td>4. Categorías</td><td><code>ciudad_procedencia</code></td><td>strip + lower + diccionario de variantes</td><td>542</td></tr>
+            <tr><td>5. Fechas</td><td><code>fecha_matricula</code></td><td>Convertir DD/MM/AAAA y AAAA-MM-DD a fecha</td><td>3.052</td></tr>
+            <tr><td>6. Duplicados</td><td>todas</td><td>Eliminar filas idénticas</td><td>150</td></tr>
+            <tr><td>7. Faltantes</td><td><code>promedio_acumulado</code></td><td>Eliminar filas</td><td>298</td></tr>
+            <tr><td>7. Faltantes</td><td><code>ciudad_procedencia</code></td><td>Rellenar con "Sin dato"</td><td>96</td></tr>
+            <tr><td>7. Faltantes</td><td><code>tipo_colegio</code></td><td>Rellenar con "Sin dato"</td><td>145</td></tr>
+            <tr><td>7. Faltantes</td><td><code>motivo_retiro</code></td><td>Dejar los nulos (son esperados)</td><td>6.562</td></tr>
+            <tr><td>7. Faltantes</td><td><code>asistencia_pct</code></td><td>Dejar los nulos</td><td>197</td></tr>
+            <tr><td>7. Faltantes</td><td><code>distancia_km</code></td><td>Dejar los nulos</td><td>334</td></tr>
+            <tr><td>8. Imposibles</td><td><code>edad</code></td><td>Fuera de 15-60 a la mediana (22)</td><td>12</td></tr>
+            <tr><td>8. Imposibles</td><td><code>promedio_acumulado</code></td><td>Mayores a 5 a nulo y eliminar fila</td><td>15</td></tr>
+            <tr><td>8. Imposibles</td><td><code>horas_trabajo_semana</code></td><td>Nulo con trabaja = "no" a 0</td><td>2.703</td></tr>
+            <tr><td>8. Imposibles</td><td><code>horas_trabajo_semana</code></td><td>Mayores a 100 a la mediana de quienes trabajan (24)</td><td>29</td></tr>
+            <tr><td>9. Variables</td><td><code>desertor</code></td><td>Crear columna True/False</td><td>3.136</td></tr>
+            <tr><td>9. Variables</td><td><code>cuartil_asistencia</code></td><td>Crear cuartiles con qcut</td><td>9.490</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Las decisiones que más pesan</h3>
+      <p><strong>Promedios faltantes e imposibles: se eliminan.</strong> Una nota no se puede inventar. Imputar la media acercaría todos los grupos al promedio general y escondería las diferencias que se quieren medir.</p>
+      <p><strong>Ciudad y tipo de colegio: "Sin dato".</strong> Son datos descriptivos; eliminar la fila haría perder al estudiante en las demás preguntas.</p>
+      <p><strong>Horas de trabajo: 0 para quienes no trabajan.</strong> Todos los guiones eran de estudiantes con <code>trabaja = "no"</code>.</p>
+      <p><strong>Asistencia faltante: se deja como nulo.</strong> Es la variable de la pregunta 5; imputarla inventaría la relación que se quiere medir.</p>
+    </section>
+
+    <!-- ===================== GRÁFICOS ===================== -->
+    <section id="graficos">
+      <h2>Gráficos</h2>
+      <p class="intro">Las imágenes están en la carpeta <code>Data/processed/graficos/</code>.</p>
+
+      <figure>
+        <img src="Data/processed/graficos/mapa_faltantes.png" alt="Mapa de faltantes del dataset original">
+        <figcaption>Gráfico 1. Mapa de faltantes del dataset original.</figcaption>
+      </figure>
+      <p>Los huecos más visibles están en <code>motivo_retiro</code>, y son esperados. Le siguen <code>promedio_acumulado</code>, <code>distancia_km</code>, <code>tipo_colegio</code> y <code>ciudad_procedencia</code>, que coinciden con los nulos del diagnóstico. El mapa no muestra los faltantes disfrazados (<code>-</code> y 999), porque Pandas no los reconoce como nulos.</p>
+
+      <figure>
+        <img src="Data/processed/graficos/distribuciones_antes_despues.png" alt="Boxplots de promedio y edad antes y después de limpiar">
+        <figcaption>Gráfico 2. Promedio acumulado y edad, antes y después de limpiar.</figcaption>
+      </figure>
+      <p>Antes de limpiar, los promedios de 45 a 78 y la edad de 150 aplastan las cajas contra el borde. Después, el promedio queda entre 1,17 y 5,00 y la edad entre 17 y 29 años. Los puntos sueltos que quedan son valores posibles, no errores.</p>
+
+      <figure>
+        <img src="Data/processed/graficos/tasa_desercion_por_programa.png" alt="Tasa de deserción por programa">
+        <figcaption>Gráfico 3. Tasa de deserción por programa.</figcaption>
+      </figure>
+      <p>Ingeniería Industrial tiene la tasa más alta (40,2 %) y Psicología la más baja (26,0 %).</p>
+
+      <figure>
+        <img src="Data/processed/graficos/tasa_desercion_por_asistencia.png" alt="Tasa de deserción por cuartil de asistencia">
+        <figcaption>Gráfico 4. Tasa de deserción por cuartil de asistencia.</figcaption>
+      </figure>
+      <p>La deserción baja en cada cuartil: 61,9 % en el de asistencia más baja y 9,4 % en el más alto.</p>
+    </section>
+
+    <!-- ===================== 3. PREGUNTAS ===================== -->
+    <section id="preguntas">
+      <h2><span class="numero">3</span>Las cinco preguntas</h2>
+      <p class="intro">Todas las respuestas usan el dataset limpio (9.687 estudiantes) e incluyen el número de estudiantes por grupo.</p>
+
+      <!-- Pregunta 1 -->
+      <div class="tarjeta">
+        <h3>Pregunta 1. ¿Qué programa presenta la tasa de deserción más alta?</h3>
+        <div class="tabla-scroll">
+          <table>
+            <thead><tr><th>Programa</th><th>Tasa de deserción</th><th>Estudiantes</th></tr></thead>
+            <tbody>
+              <tr><td>Ingeniería Industrial</td><td>40,2 %</td><td>1.271</td></tr>
+              <tr><td>Ingeniería de Sistemas</td><td>38,2 %</td><td>1.386</td></tr>
+              <tr><td>Diseño Gráfico</td><td>35,6 %</td><td>848</td></tr>
+              <tr><td>Enfermería</td><td>31,3 %</td><td>1.132</td></tr>
+              <tr><td>Derecho</td><td>30,5 %</td><td>1.447</td></tr>
+              <tr><td>Administración de Empresas</td><td>29,7 %</td><td>1.304</td></tr>
+              <tr><td>Contaduría Pública</td><td>27,0 %</td><td>1.162</td></tr>
+              <tr><td>Psicología</td><td>26,0 %</td><td>1.137</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="conclusion"><strong>Ingeniería Industrial</strong>, con 40,2 % de 1.271 estudiantes, unos 8 puntos por encima del promedio de la institución (32,4 %). La más baja es Psicología, con 26,0 %. Todos los programas tienen más de 800 estudiantes, así que ninguna tasa depende de un grupo pequeño.</p>
+      </div>
+
+      <!-- Pregunta 2 -->
+      <div class="tarjeta">
+        <h3>Pregunta 2. ¿Hay diferencia en la deserción entre becados y no becados?</h3>
+        <div class="tabla-scroll">
+          <table>
+            <thead><tr><th>Beca</th><th>Tasa de deserción</th><th>Estudiantes</th></tr></thead>
+            <tbody>
+              <tr><td>No</td><td>36,4 %</td><td>7.004</td></tr>
+              <tr><td>Sí</td><td>21,9 %</td><td>2.683</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="conclusion">Sí: los no becados desertan un 36,4 % y los becados un 21,9 %, una diferencia de 14,5 puntos porcentuales. Pero esa diferencia <strong>no prueba que la beca cause la permanencia</strong> (ver la reflexión 4).</p>
+      </div>
+
+      <!-- Pregunta 3 -->
+      <div class="tarjeta">
+        <h3>Pregunta 3. ¿Qué jornada tiene el menor promedio acumulado?</h3>
+        <div class="tabla-scroll">
+          <table>
+            <thead><tr><th>Jornada</th><th>Promedio acumulado</th><th>Estudiantes</th></tr></thead>
+            <tbody>
+              <tr><td>Nocturna</td><td>3,46</td><td>2.666</td></tr>
+              <tr><td>Fin de semana</td><td>3,70</td><td>949</td></tr>
+              <tr><td>Diurna</td><td>3,73</td><td>6.072</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="conclusion">La jornada <strong>nocturna</strong>, con 3,46, frente a 3,73 en la diurna. Fin de semana es el grupo más pequeño (949 estudiantes), pero sigue siendo lo bastante grande para compararlo.</p>
+      </div>
+
+      <!-- Pregunta 4 -->
+      <div class="tarjeta">
+        <h3>Pregunta 4. ¿Cuántas materias reprobadas tienen en promedio los desertores frente a los activos?</h3>
+        <div class="tabla-scroll">
+          <table>
+            <thead><tr><th>Estado</th><th>Materias reprobadas (promedio)</th><th>Estudiantes</th></tr></thead>
+            <tbody>
+              <tr><td>Activo</td><td>0,62</td><td>5.692</td></tr>
+              <tr><td>Desertor</td><td>3,07</td><td>3.136</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="conclusion">Los desertores reprobaron en promedio <strong>3,07</strong> materias y los activos <strong>0,62</strong>, unas 5 veces más. Se excluyó a los 859 graduados porque la pregunta compara a quienes abandonaron con quienes siguen estudiando, y los graduados no pertenecen a ninguno de los dos grupos.</p>
+      </div>
+
+      <!-- Pregunta 5 -->
+      <div class="tarjeta">
+        <h3>Pregunta 5. ¿La deserción aumenta conforme baja la asistencia?</h3>
+        <div class="tabla-scroll">
+          <table>
+            <thead><tr><th>Cuartil</th><th>Asistencia media</th><th>Tasa de deserción</th><th>Estudiantes</th></tr></thead>
+            <tbody>
+              <tr><td>Q1 (más baja)</td><td>73,9 %</td><td>61,9 %</td><td>2.385</td></tr>
+              <tr><td>Q2</td><td>84,4 %</td><td>36,7 %</td><td>2.386</td></tr>
+              <tr><td>Q3</td><td>91,3 %</td><td>20,7 %</td><td>2.348</td></tr>
+              <tr><td>Q4 (más alta)</td><td>98,7 %</td><td>9,4 %</td><td>2.371</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="conclusion">Sí, de forma constante: entre quienes menos asisten deserta el 61,9 %, y entre quienes más asisten solo el 9,4 %. Aun así <strong>no es una prueba de causa</strong>: faltar a clase puede ser un síntoma de que el estudiante ya piensa en retirarse, o ambas cosas pueden tener una causa común, como trabajar muchas horas.</p>
+        <p class="nota">197 estudiantes sin dato de asistencia quedan fuera de esta tabla.</p>
+      </div>
+    </section>
+
+    <!-- ===================== 4. CAUSALIDAD ===================== -->
+    <section id="causalidad">
+      <h2><span class="numero">4</span>Reflexión: asociación y causalidad</h2>
+      <div class="tarjeta">
+        <h3>Si la deserción es menor entre los becados, ¿la beca causa la permanencia?</h3>
+        <p>No se puede concluir con estos datos. Los becados desertan menos (21,9 % frente a 36,4 %), pero eso es una asociación. Hay otras explicaciones posibles:</p>
+        <ul>
+          <li><strong>Selección:</strong> muchas becas se dan por mérito académico, así que los becados pudieron tener menos riesgo desde antes de recibirla.</li>
+          <li><strong>Variables de confusión:</strong> la motivación, el apoyo familiar o la situación económica pueden influir a la vez en conseguir la beca y en permanecer.</li>
+          <li><strong>Condición de la beca:</strong> si exige mantener un promedio, quien empieza a fallar la pierde y pasa a contarse como no becado.</li>
+        </ul>
+        <p>Para distinguir una causa habría que comparar estudiantes parecidos en todo lo demás, con y sin beca. Lo ideal sería un experimento: sortear becas entre estudiantes que cumplen los mismos requisitos y comparar después la deserción de cada grupo.</p>
+      </div>
+    </section>
+
+    <!-- ===================== 5. PREDICCIÓN ===================== -->
+    <section id="prediccion">
+      <h2><span class="numero">5</span>Reflexión: <code>motivo_retiro</code> y la predicción</h2>
+      <div class="tarjeta">
+        <h3>¿Puede usarse <code>motivo_retiro</code> para predecir la deserción antes de que ocurra?</h3>
+        <p>No. Esa columna solo se llena después de que el estudiante deserta: los 3.136 desertores la tienen llena y todos los activos y graduados la tienen vacía. Un modelo que la use parecería perfecto con los datos históricos, pero sería inútil en la práctica, porque un estudiante activo siempre la tiene vacía. Eso es una <strong>fuga de información</strong>.</p>
+        <p>Otras columnas con el mismo problema o un riesgo parecido:</p>
+        <ul>
+          <li><strong><code>estado</code></strong> y <strong><code>desertor</code></strong>: son el resultado mismo.</li>
+          <li><strong><code>creditos_aprobados</code></strong> y <strong><code>semestre</code></strong>: dependen de cuánto tiempo permaneció el estudiante.</li>
+          <li><strong><code>materias_reprobadas</code></strong> y <strong><code>asistencia_pct</code></strong>: si se midieron al final, pueden incluir los semestres en que el estudiante ya estaba abandonando.</li>
+        </ul>
+        <p>La regla es usar solo información que la institución conoce en el momento en que quiere predecir.</p>
+      </div>
+    </section>
+
+    <!-- ===================== 6. VARIABLES SENSIBLES ===================== -->
+    <section id="sensibles">
+      <h2><span class="numero">6</span>Reflexión: uso de variables sensibles</h2>
+      <div class="tarjeta">
+        <h3>¿Debería la institución usar género, estrato o ciudad para decidir quién recibe apoyo?</h3>
+        <p>No como criterio directo de selección. Estas variables reflejan desigualdades sociales, y usarlas para decidir tiene riesgos:</p>
+        <ul>
+          <li><strong>Discriminación:</strong> se decidiría por algo que el estudiante no eligió, como su estrato o su género, y no por cómo le va en la universidad. Un estudiante de estrato alto con muchas materias perdidas podría quedarse sin apoyo, mientras uno de estrato bajo con excelentes notas lo recibiría sin necesitarlo.</li>
+          <li><strong>Estigmatización:</strong> etiquetar a un grupo como "de riesgo" puede hacer que profesores y estudiantes esperen menos de ellos, y esa etiqueta termina causando la deserción que se quería evitar.</li>
+          <li><strong>Errores individuales:</strong> una tasa describe al grupo, no a cada persona. Aunque un grupo deserte más, la mayoría de sus integrantes puede terminar la carrera, y en los grupos "de bajo riesgo" también hay estudiantes que necesitan ayuda y quedarían por fuera.</li>
+          <li><strong>Reforzar la desigualdad:</strong> si un grupo desertó más en el pasado porque tuvo menos apoyo, usar esos datos para darle aún menos apoyo hace que la desigualdad se repita y crezca.</li>
+        </ul>
+        <p>Es más justo priorizar con señales de comportamiento en las que la institución puede intervenir, como la baja asistencia (61,9 % de deserción en el cuartil más bajo frente a 9,4 % en el más alto) o las materias reprobadas (3,07 en desertores frente a 0,62 en activos). Las variables sensibles sirven para <strong>auditar</strong> que los apoyos lleguen de forma equitativa a todos los grupos, no para decidir a quién se ayuda.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================== PIE DE PÁGINA ===================== -->
+  <footer>
+    <div class="contenedor">
+      Datos sintéticos generados para el taller; no corresponden a estudiantes reales. Análisis realizado con Python y Pandas en <code>analisis_desercion.py</code>.
+    </div>
+  </footer>
+
+</body>
+</html>

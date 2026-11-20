@@ -1,0 +1,296 @@
+
+
+:root {
+  --navy: #14213d;        
+  --navy-claro: #1f3461;  
+  --azul-suave: #e8edf6;  
+  --dorado: #e0a526;      
+  --dorado-suave: #fbf3e0;
+  --fondo: #f5f7fb;       
+  --blanco: #ffffff;
+  --texto: #1b2333;
+  --gris: #5b6577;        
+  --borde: #dde3ee;
+}
+
+/* 2. Reglas generales */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--fondo);
+  color: var(--texto);
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* Contenedor que centra el contenido y deja márgenes a los lados */
+.contenedor {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* 3. Encabezado */
+header {
+  background: linear-gradient(135deg, var(--navy), var(--navy-claro));
+  color: var(--blanco);
+  padding: 44px 0 32px;
+}
+
+.etiqueta {
+  color: var(--dorado);
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: 38px;
+  line-height: 1.2;
+  margin: 8px 0 10px;
+}
+
+.subtitulo {
+  color: #c9d3e8;
+  max-width: 700px;
+  margin: 0;
+}
+
+/* Tarjetas con las cifras principales */
+.cifras {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.cifra {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.cifra strong {
+  display: block;
+  font-size: 28px;
+}
+
+.cifra span {
+  color: #c9d3e8;
+  font-size: 14px;
+}
+
+/* 4. Menú de navegación (se queda fijo arriba al bajar) */
+nav {
+  position: sticky;
+  top: 0;
+  background-color: var(--navy);
+  border-bottom: 3px solid var(--dorado);
+}
+
+nav .contenedor {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;   /* en celular el menú se desliza de lado */
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+nav a {
+  color: #dbe3f3;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  font-size: 15px;
+}
+
+nav a:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: var(--blanco);
+}
+
+/* 5. Secciones y títulos */
+main {
+  padding: 36px 0 60px;
+}
+
+section {
+  margin-bottom: 52px;
+  scroll-margin-top: 70px;  /* para que el menú fijo no tape el título al hacer clic */
+}
+
+h2 {
+  font-size: 24px;
+  margin: 0 0 6px;
+}
+
+/* Círculo navy con el número de cada sección */
+.numero {
+  display: inline-block;
+  width: 34px;
+  height: 34px;
+  line-height: 34px;
+  text-align: center;
+  border-radius: 50%;
+  background-color: var(--navy);
+  color: var(--blanco);
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+h3 {
+  font-size: 18px;
+  margin: 26px 0 8px;
+}
+
+.intro {
+  color: var(--gris);
+  margin-top: 0;
+}
+
+code {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 14px;
+  background-color: var(--azul-suave);
+  color: var(--navy-claro);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* 6. Tablas */
+.tabla-scroll {
+  overflow-x: auto;   /* si la tabla no cabe en el celular, se desliza de lado */
+  background-color: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--borde);
+  vertical-align: top;
+}
+
+th {
+  background-color: var(--navy);
+  color: var(--blanco);
+  white-space: nowrap;
+}
+
+td:first-child {
+  white-space: nowrap;
+}
+
+/* Filas alternas en azul claro para leer mejor */
+tbody tr:nth-child(even) {
+  background-color: var(--azul-suave);
+}
+
+/* 7. Gráficos */
+figure {
+  margin: 20px 0;
+  background-color: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+figcaption {
+  color: var(--gris);
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+/* 8. Tarjetas de las preguntas y de las reflexiones */
+.tarjeta {
+  background-color: var(--blanco);
+  border: 1px solid var(--borde);
+  border-top: 4px solid var(--navy);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin: 18px 0 28px;
+}
+
+.tarjeta h3 {
+  margin-top: 0;
+}
+
+.tarjeta li {
+  margin-bottom: 6px;
+}
+
+/* Recuadro dorado con la conclusión de cada pregunta */
+.conclusion {
+  background-color: var(--dorado-suave);
+  border-left: 4px solid var(--dorado);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin: 14px 0 0;
+}
+
+.nota {
+  color: var(--gris);
+  font-size: 14px;
+}
+
+/* 9. Botones para abrir los CSV */
+.botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.boton {
+  background-color: var(--navy);
+  color: var(--blanco);
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.boton:hover {
+  background-color: var(--navy-claro);
+}
+
+/* 10. Pie de página */
+footer {
+  background-color: var(--navy);
+  color: #c9d3e8;
+  font-size: 14px;
+  padding: 22px 0 36px;
+}
+
+/* 11. Ajustes para celular (pantallas de menos de 700 px) */
+@media (max-width: 700px) {
+  h1 {
+    font-size: 28px;
+  }
+
+  .cifras {
+    grid-template-columns: repeat(2, 1fr);  /* 2 tarjetas por fila en vez de 4 */
+  }
+}
