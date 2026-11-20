@@ -240,5 +240,97 @@ Después de este paso quedan 9.687 filas. La edad queda entre 17 y 29 años, el 
 
 El dataset limpio queda con 9.687 filas y 25 columnas.
 
-9.
+**3**
+### 3. Respuestas a las cinco preguntas
+
+Todas las respuestas usan el dataset limpio (9.687 estudiantes). La tasa global de deserción es 32,4 %.
+
+**Pregunta 1. ¿Qué programa presenta la tasa de deserción más alta?**
+
+| Programa | Tasa de deserción | Estudiantes |
+|---|---|---|
+| Ingeniería Industrial | 40,2 % | 1.271 |
+| Ingeniería de Sistemas | 38,2 % | 1.386 |
+| Diseño Gráfico | 35,6 % | 848 |
+| Enfermería | 31,3 % | 1.132 |
+| Derecho | 30,5 % | 1.447 |
+| Administración de Empresas | 29,7 % | 1.304 |
+| Contaduría Pública | 27,0 % | 1.162 |
+| Psicología | 26,0 % | 1.137 |
+
+Ingeniería Industrial tiene la tasa más alta: 40,2 % de 1.271 estudiantes, unos 8 puntos por encima del promedio de la institución. La más baja es Psicología, con 26,0 %. Todos los programas tienen más de 800 estudiantes, así que ninguna tasa depende de un grupo pequeño. Diseño Gráfico, el más pequeño (848), merece algo más de cuidado.
+
+**Pregunta 2. ¿Hay diferencia en la deserción entre becados y no becados?**
+
+| Beca | Tasa de deserción | Estudiantes |
+|---|---|---|
+| No | 36,4 % | 7.004 |
+| Sí | 21,9 % | 2.683 |
+
+Sí. Los no becados desertan un 36,4 % y los becados un 21,9 %, una diferencia de 14,5 puntos porcentuales. Pero esa diferencia no prueba que la beca cause la permanencia: las becas suelen darse a estudiantes con buen rendimiento, que ya tenían menos riesgo de desertar (ver la reflexión 4).
+
+**Pregunta 3. ¿Qué jornada tiene el menor promedio acumulado?**
+
+| Jornada | Promedio acumulado | Estudiantes |
+|---|---|---|
+| Nocturna | 3,46 | 2.666 |
+| Fin de semana | 3,70 | 949 |
+| Diurna | 3,73 | 6.072 |
+
+La jornada nocturna tiene el menor promedio: 3,46, frente a 3,73 en la diurna. Fin de semana es el grupo más pequeño (949 estudiantes), pero sigue siendo lo bastante grande para compararlo.
+
+**Pregunta 4. ¿Cuántas materias reprobadas tienen en promedio los desertores frente a los activos?**
+
+| Estado | Materias reprobadas (promedio) | Estudiantes |
+|---|---|---|
+| Activo | 0,62 | 5.692 |
+| Desertor | 3,07 | 3.136 |
+
+Los desertores reprobaron en promedio 3,07 materias y los activos 0,62, unas 5 veces más. Se excluyó a los 859 graduados porque la pregunta compara a quienes abandonaron con quienes siguen estudiando: los graduados ya terminaron la carrera, no pertenecen a ninguno de los dos grupos, y al incluirlos se mezclaría la comparación.
+
+**Pregunta 5. ¿La deserción aumenta conforme baja la asistencia?**
+
+| Cuartil | Asistencia media | Tasa de deserción | Estudiantes |
+|---|---|---|---|
+| Q1 (más baja) | 73,9 % | 61,9 % | 2.385 |
+| Q2 | 84,4 % | 36,7 % | 2.386 |
+| Q3 | 91,3 % | 20,7 % | 2.348 |
+| Q4 (más alta) | 98,7 % | 9,4 % | 2.371 |
+
+Sí, y de forma constante: la tasa baja en cada cuartil. Entre quienes menos asisten (73,9 % de asistencia media) deserta el 61,9 %; entre quienes más asisten (98,7 %), solo el 9,4 %. Aun así no es una prueba de causa: faltar a clase puede ser un síntoma de que el estudiante ya está pensando en retirarse, o ambas cosas pueden tener una causa común, como trabajar muchas horas o tener problemas económicos. Los 197 estudiantes sin dato de asistencia quedan fuera de esta tabla.
+
+### 4. Reflexión: asociación y causalidad
+
+**Si la deserción es menor entre los becados, ¿la beca causa la permanencia?**
+
+No se puede concluir con estos datos. Los becados desertan menos (21,9 % frente a 36,4 %), pero eso es una asociación, no es un dato del cual la institución concluya que la beca causa permanencia. 
+- **Selección:** muchas becas se dan por mérito académico. Los becados pudieron tener mejores notas y menos riesgo de desertar desde antes de recibir la beca.
+- **Variables de confusión:** la motivación, el apoyo familiar o la situación económica pueden influir al mismo tiempo en conseguir una beca y en permanecer.
+- **Condición de la beca:** si la beca exige mantener un promedio, quien empieza a fallar la pierde y pasa a contarse como no becado. Esto puede causar mayor estrés y presión en el estudiante de poder alcanzar un título de manera gratuita, debido a que cabe la posibilidad de que por mal rendimiento pierda la oportunidad de seguir estudiando y no poder financiar sus estudios con recursos propios. 
+
+Para distinguir una causa de una asociación habría que comparar estudiantes parecidos en todo lo demás (mismo promedio de ingreso, estrato y programa), con beca y sin beca. Lo ideal sería un experimento, por ejemplo sortear becas entre estudiantes que cumplen los mismos requisitos y comparar después la deserción de cada grupo.
+
+### 5. Reflexión: `motivo_retiro` y la predicción
+
+**¿Puede usarse `motivo_retiro` para predecir la deserción antes de que ocurra?**
+
+No. Esa columna solo se llena después de que el estudiante deserta: los 3.136 desertores la tienen llena y todos los activos y graduados la tienen vacía. Si se usa en un modelo, el modelo "adivinaría" con los datos del historial, pero sería inútil en la práctica, porque un estudiante que todavía está estudiando siempre tiene ese campo vacío.
+
+Otras columnas con el mismo problema o un riesgo parecido:
+
+- **`estado`** y **`desertor`:** son el resultado mismo que se quiere predecir.
+- **`creditos_aprobados`** y **`semestre`:** dependen de cuánto tiempo permaneció el estudiante. Quien desertó temprano acumuló menos créditos porque se fue, no al revés.
+- **`materias_reprobadas`** y **`asistencia_pct`:** si se midieron al final y no en el momento de la predicción, pueden incluir los semestres en que el estudiante ya estaba abandonando.
+
+
+### 6. Reflexión: uso de variables sensibles
+
+**Si género, estrato o ciudad aparecen asociados a la deserción, ¿debería la institución usarlos para decidir qué estudiantes reciben apoyo?**
+
+No como criterio directo de selección. Estas variables reflejan desigualdades sociales, y usarlas para decidir tiene riesgos como:
+
+- **Estigmatización:** etiquetar a un grupo como "de riesgo" puede hacer que profesores y estudiantes esperen menos de ellos, y esa etiqueta termina causando la deserción que se quería evitar.
+- **Errores individuales:** una tasa describe al grupo, no a cada persona. Aunque un grupo deserte más, la mayoría de sus integrantes puede terminar la carrera, y en los grupos "de bajo riesgo" también hay estudiantes que necesitan ayuda y quedarían por fuera.
+
+Una alternativa más justa es priorizar con señales de comportamiento que la institución observa y en las que puede intervenir, como la baja asistencia (la deserción pasa de 9,4 % en Q4 a 61,9 % en Q1) o las materias reprobadas (3,07 en desertores frente a 0,62 en activos).
 

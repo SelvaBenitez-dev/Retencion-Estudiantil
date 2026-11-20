@@ -532,7 +532,48 @@ def responder_preguntas(df):
                 (Usa cuartil_asistencia.)
     """
     # TODO 14: responder las cinco preguntas con groupby() y agg().
-    pass
+     #Pregunta 1: programa con mayor tasa de deserción 
+    p1 = (df.groupby("programa")
+            .agg(tasa=("desertor", "mean"), estudiantes=("desertor", "size"))
+            .sort_values("tasa", ascending=False))
+    print("\nPregunta 1: tasa de deserción por programa")
+    print(p1.round(3))
+    print(f"-> Mayor tasa: {p1.index[0]} ({p1['tasa'].iloc[0]:.1%}, "
+          f"{p1['estudiantes'].iloc[0]} estudiantes)")
+
+    # Pregunta 2: becados frente a no becados
+    p2 = df.groupby("beca").agg(tasa=("desertor", "mean"), estudiantes=("desertor", "size"))
+    print("\nPregunta 2: tasa de deserción según beca")
+    print(p2.round(3))
+    diferencia = p2.loc["no", "tasa"] - p2.loc["sí", "tasa"]
+    print(f"-> Diferencia: {diferencia * 100:.1f} puntos porcentuales")
+
+    # Pregunta 3: jornada con menor promedio acumulado
+    p3 = (df.groupby("jornada")
+            .agg(promedio=("promedio_acumulado", "mean"),
+                 estudiantes=("promedio_acumulado", "size"))
+            .sort_values("promedio"))
+    print("\nPregunta 3: promedio acumulado por jornada")
+    print(p3.round(3))
+    print(f"-> Menor promedio: {p3.index[0]} ({p3['promedio'].iloc[0]:.2f})")
+
+    # Pregunta 4: materias reprobadas, desertores frente a activos 
+    # Se excluye a los graduados porque no pertenecen a ninguno de los dos grupos.
+    sin_graduados = df[df["estado"] != "graduado"]
+    p4 = (sin_graduados.groupby("estado")
+            .agg(reprobadas=("materias_reprobadas", "mean"),
+                 estudiantes=("materias_reprobadas", "size")))
+    print("\nPregunta 4: materias reprobadas en promedio (sin graduados)")
+    print(p4.round(2))
+    print("Graduados excluidos:", (df["estado"] == "graduado").sum())
+
+    #Pregunta 5: deserción por cuartil de asistencia 
+    p5 = (df.groupby("cuartil_asistencia", observed=True)
+            .agg(tasa=("desertor", "mean"),
+                 asistencia_media=("asistencia_pct", "mean"),
+                 estudiantes=("desertor", "size")))
+    print("\nPregunta 5: tasa de deserción por cuartil de asistencia")
+    print(p5.round(3))
 
 
 def guardar(df):
